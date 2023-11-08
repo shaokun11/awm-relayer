@@ -8,6 +8,7 @@ package evm
 import (
 	"context"
 	"crypto/ecdsa"
+	"fmt"
 	"math/big"
 	"runtime"
 	"sync"
@@ -159,7 +160,11 @@ func (c *destinationClient) SendTx(signedMessage *avalancheWarp.Message,
 		warp.ContractAddress,
 		signedMessage.Bytes(),
 	)
-
+	fmt.Printf("-------1------")
+	fmt.Println(tx)
+	fmt.Printf("-------2------")
+	fmt.Printf("%+v\n", tx)
+	fmt.Printf("-------3------")
 	// Sign and send the transaction on the destination chain
 	signer := types.LatestSignerForChainID(destinationChainIDBigInt)
 	signedTx, err := types.SignTx(tx, signer, c.pk)
