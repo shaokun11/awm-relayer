@@ -165,7 +165,7 @@ func (c *destinationClient) SendTx(signedMessage *avalancheWarp.Message,
 	fmt.Println(tx)
 	fmt.Println("-------2--json----")
 	json, _ := json2.Marshal(tx)
-	fmt.Println(json)
+	fmt.Println(string(json))
 	fmt.Println("-------3---v---")
 	fmt.Printf("%+v\n", tx)
 	fmt.Println("-------4--AccessList----")
