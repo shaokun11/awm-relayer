@@ -8,6 +8,7 @@ package evm
 import (
 	"context"
 	"crypto/ecdsa"
+	json2 "encoding/json"
 	"fmt"
 	"math/big"
 	"runtime"
@@ -160,11 +161,15 @@ func (c *destinationClient) SendTx(signedMessage *avalancheWarp.Message,
 		warp.ContractAddress,
 		signedMessage.Bytes(),
 	)
-	fmt.Printf("-------1------")
+	fmt.Println("-------1--raw----")
 	fmt.Println(tx)
-	fmt.Printf("-------2------")
+	fmt.Println("-------2--json----")
+	json, _ := json2.Marshal(tx)
+	fmt.Println(json)
+	fmt.Println("-------3---v---")
 	fmt.Printf("%+v\n", tx)
-	fmt.Printf("-------3------")
+	fmt.Println("-------4--AccessList----")
+	fmt.Printf("%+v\n", tx.AccessList())
 	// Sign and send the transaction on the destination chain
 	signer := types.LatestSignerForChainID(destinationChainIDBigInt)
 	signedTx, err := types.SignTx(tx, signer, c.pk)

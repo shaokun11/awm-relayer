@@ -36,6 +36,7 @@ const (
 )
 
 func main() {
+	fmt.Printf("-------------start my relayer-----------------------------")
 	fs := config.BuildFlagSet()
 	v, err := config.BuildViper(fs, os.Args[1:])
 	if err != nil {
