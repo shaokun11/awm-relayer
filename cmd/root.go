@@ -7,6 +7,7 @@ import (
 	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/spf13/cobra"
 	"math/big"
+	"os"
 )
 
 var rootCmd = &cobra.Command{
@@ -24,10 +25,10 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(greetCmd)
+	rootCmd.AddCommand(txCmd)
 }
 
-var greetCmd = &cobra.Command{
+var txCmd = &cobra.Command{
 	Use:   "tx",
 	Short: "parse the tx msg without 0x",
 	Args:  cobra.ExactArgs(1),
@@ -45,7 +46,7 @@ var greetCmd = &cobra.Command{
 		v, r, s := tx.RawSignatureValues()
 		tx_ := struct {
 			Hash       string           `json:"hash"`
-			ChainId    *big.Int         `json:"chain_id"`
+			ChainId    string           `json:"chain_id"`
 			To         string           `json:"to"`
 			Data       string           `json:"data"`
 			AccessList types.AccessList `json:"access_list"`
@@ -55,21 +56,21 @@ var greetCmd = &cobra.Command{
 			Nonce      uint64           `json:"nonce"`
 			GasFeeCap  *big.Int         `json:"gas_fee_cap"`
 			GasTipCap  *big.Int         `json:"gas_tip_cap"`
-			V          *big.Int         `json:"v"`
-			S          *big.Int         `json:"s"`
-			R          *big.Int         `json:"r"`
+			V          string           `json:"v"`
+			S          string           `json:"s"`
+			R          string           `json:"r"`
 		}{
 
 			Hash:       tx.Hash().Hex(),
 			AccessList: tx.AccessList(),
-			ChainId:    tx.ChainId(),
+			ChainId:    tx.ChainId().String(),
 			Value:      tx.Value(),
 			Nonce:      tx.Nonce(),
 			To:         tx.To().Hex(),
 			GasFeeCap:  tx.GasFeeCap(),
-			R:          r,
-			S:          s,
-			V:          v,
+			R:          r.String(),
+			S:          s.String(),
+			V:          v.String(),
 			GasTipCap:  tx.GasTipCap(),
 			GasPrice:   tx.GasPrice(),
 			Gas:        tx.Gas(),
@@ -79,6 +80,6 @@ var greetCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		println(string(marshal))
+		os.Stdout.WriteString(string(marshal))
 	},
 }
