@@ -15,7 +15,7 @@ import (
 var warpCmd = &cobra.Command{
 	Use:   "warp",
 	Short: "parse to access list data to warp message bytes",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		decodeString, err := hexutil.Decode(args[0])
 		unpackedPredicateBytes, err := predicate.UnpackPredicate(decodeString)
