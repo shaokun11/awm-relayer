@@ -21,14 +21,21 @@ var warpCmd = &cobra.Command{
 		unpackedPredicateBytes, err := predicate.UnpackPredicate(decodeString)
 		warpMessage, err := warp.ParseMessage(unpackedPredicateBytes)
 		addressedPayload, err := payload.ParseAddressedPayload(warpMessage.UnsignedMessage.Payload)
+		message := warp2.WarpMessage{
+			SourceChainID:       common.Hash(warpMessage.SourceChainID),
+			OriginSenderAddress: addressedPayload.SourceAddress,
+			DestinationChainID:  addressedPayload.DestinationChainID,
+			//DestinationAddress:  addressedPayload.DestinationAddress,
+			// 因为改过TeleporterMessager的sol文件,所以这个地址可能与其他链的地址不一样
+			DestinationAddress: common.HexToAddress(args[1]),
+			Payload:            addressedPayload.Payload,
+		}
+		//println("SourceChainID", message.SourceChainID.Hex())
+		//println("OriginSenderAddress", message.OriginSenderAddress.Hex())
+		//println("DestinationChainID", message.DestinationChainID.Hex())
+		//println("DestinationAddress", message.DestinationAddress.Hex())
 		output, err := warp2.WarpABI.PackOutput("getVerifiedWarpMessage",
-			warp2.WarpMessage{
-				SourceChainID:       common.Hash(warpMessage.SourceChainID),
-				OriginSenderAddress: addressedPayload.SourceAddress,
-				DestinationChainID:  addressedPayload.DestinationChainID,
-				DestinationAddress:  addressedPayload.DestinationAddress,
-				Payload:             addressedPayload.Payload,
-			},
+			message,
 			true,
 		)
 		if err != nil {
