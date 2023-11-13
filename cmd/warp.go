@@ -22,8 +22,9 @@ var warpCmd = &cobra.Command{
 		warpMessage, err := warp.ParseMessage(unpackedPredicateBytes)
 		addressedPayload, err := payload.ParseAddressedPayload(warpMessage.UnsignedMessage.Payload)
 		message := warp2.WarpMessage{
-			SourceChainID:       common.Hash(warpMessage.SourceChainID),
-			OriginSenderAddress: addressedPayload.SourceAddress,
+			SourceChainID: common.Hash(warpMessage.SourceChainID),
+			//OriginSenderAddress: addressedPayload.SourceAddress,
+			OriginSenderAddress: common.HexToAddress(args[1]),
 			DestinationChainID:  addressedPayload.DestinationChainID,
 			//DestinationAddress:  addressedPayload.DestinationAddress,
 			// 因为改过TeleporterMessager的sol文件,所以这个地址可能与其他链的地址不一样
