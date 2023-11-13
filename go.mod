@@ -3,8 +3,10 @@ module github.com/ava-labs/awm-relayer
 go 1.20
 
 require (
+	github.com/ava-labs/avalanchego v1.10.10
 	github.com/ava-labs/subnet-evm v0.5.6
 	github.com/spf13/cobra v1.0.0
+	github.com/status-im/keycard-go v0.2.0
 )
 
 require (
@@ -16,7 +18,6 @@ require (
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/VictoriaMetrics/fastcache v1.10.0 // indirect
-	github.com/ava-labs/avalanchego v1.10.10 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect

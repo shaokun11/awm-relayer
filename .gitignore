@@ -8,3 +8,5 @@ main.log
 server.log
 *.test
 dist
+
+dist/
