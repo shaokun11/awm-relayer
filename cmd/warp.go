@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	"github.com/ava-labs/awm-relayer/utils"
 	"github.com/ava-labs/subnet-evm/utils/predicate"
@@ -33,6 +34,15 @@ var warpCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		utils.ToNode(hexutil.Encode(output))
+		var warp = struct {
+			Data string `json:"data"`
+		}{
+			Data: hexutil.Encode(output),
+		}
+		marshal, err := json.Marshal(warp)
+		if err != nil {
+			panic(err)
+		}
+		utils.ToNode(string(marshal))
 	},
 }
