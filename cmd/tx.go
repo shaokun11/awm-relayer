@@ -12,7 +12,7 @@ import (
 
 var txCmd = &cobra.Command{
 	Use:   "tx",
-	Short: "parse awm tx msg ",
+	Short: "parse receive cross chain raw message to struct info ",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		var tx types.Transaction

@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var warpCmd = &cobra.Command{
-	Use:   "warp",
+var accessListCmd = &cobra.Command{
+	Use:   "access-list",
 	Short: "parse to access list data to warp message bytes",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
