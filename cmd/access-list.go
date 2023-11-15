@@ -16,10 +16,19 @@ var accessListCmd = &cobra.Command{
 	Use:   "access-list",
 	Short: "parse to access list data to warp message bytes",
 	Args:  cobra.ExactArgs(2),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		decodeString, err := hexutil.Decode(args[0])
+		if err != nil {
+			return err
+		}
 		unpackedPredicateBytes, err := predicate.UnpackPredicate(decodeString)
+		if err != nil {
+			return err
+		}
 		warpMessage, err := warp.ParseMessage(unpackedPredicateBytes)
+		if err != nil {
+			return err
+		}
 		addressedPayload, err := payload.ParseAddressedPayload(warpMessage.UnsignedMessage.Payload)
 		message := warp2.WarpMessage{
 			SourceChainID: common.Hash(warpMessage.SourceChainID),
@@ -40,7 +49,7 @@ var accessListCmd = &cobra.Command{
 			true,
 		)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		var warp = struct {
 			Data string `json:"data"`
@@ -49,8 +58,9 @@ var accessListCmd = &cobra.Command{
 		}
 		marshal, err := json.Marshal(warp)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		utils.ToNode(string(marshal))
+		return nil
 	},
 }
