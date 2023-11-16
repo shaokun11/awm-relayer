@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"math/big"
 	"time"
 
@@ -135,7 +136,7 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 	// Get the current canonical validator set of the source subnet.
 	validatorSet, totalValidatorWeight, err := r.getCurrentCanonicalValidatorSet()
 	if err != nil {
-		r.logger.Error(
+		r.logger.Info(
 			"Failed to get the canonical subnet validator set",
 			zap.String("subnetID", r.relayer.sourceSubnetID.String()),
 			zap.Error(err),
@@ -165,7 +166,7 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 	// 		 We should check if the connected set represents sufficient stake, and continue if so.
 	_, err = r.relayer.network.ConnectPeers(nodeIDs)
 	if err != nil {
-		r.logger.Error(
+		r.logger.Info(
 			"Failed to connect to peers",
 			zap.Error(err),
 		)
@@ -178,17 +179,17 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 	}
 	reqBytes, err := msg.RequestToBytes(codec, req)
 	if err != nil {
-		r.logger.Error(
+		r.logger.Info(
 			"Failed to marshal request bytes",
 			zap.String("destinationChainID", r.destinationChainID.String()),
 			zap.Error(err),
 		)
 		return nil, err
 	}
-
+	log.Printf("-messageCreator.AppRequest -%s %v %s---------", r.warpMessage.SourceChainID, requestID, req.MessageID.String())
 	outMsg, err := r.messageCreator.AppRequest(r.warpMessage.SourceChainID, requestID, peers.DefaultAppRequestTimeout, reqBytes)
 	if err != nil {
-		r.logger.Error(
+		r.logger.Info(
 			"Failed to create app request message",
 			zap.Error(err),
 		)
@@ -202,7 +203,7 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 
 	for attempt := 1; attempt <= maxRelayerQueryAttempts; attempt++ {
 		responsesExpected := len(validatorSet) - len(signatureMap)
-		r.logger.Debug(
+		r.logger.Info(
 			"Relayer collecting signatures from peers.",
 			zap.Int("attempt", attempt),
 			zap.String("destinationChainID", r.destinationChainID.String()),
@@ -221,7 +222,7 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 			// TODO: Track failures and iterate through the validator's node list on subsequent query attempts
 			nodeID := vdr.NodeIDs[0]
 			vdrSet.Add(nodeID)
-			r.logger.Debug(
+			r.logger.Info(
 				"Added node ID to query.",
 				zap.String("nodeID", nodeID.String()),
 			)
@@ -238,14 +239,14 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 		}
 
 		sentTo := r.relayer.network.Network.Send(outMsg, vdrSet, r.relayer.sourceSubnetID, subnets.NoOpAllower)
-		r.logger.Debug(
+		r.logger.Info(
 			"Sent signature request to network",
 			zap.String("messageID", req.MessageID.String()),
 			zap.Any("sentTo", sentTo),
 		)
 		for nodeID := range vdrSet {
 			if !sentTo.Contains(nodeID) {
-				r.logger.Warn(
+				r.logger.Info(
 					"Failed to make async request to node",
 					zap.String("nodeID", nodeID.String()),
 					zap.Error(err),
@@ -259,7 +260,7 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 			// Handle the responses. For each response, we need to call response.OnFinishedHandling() exactly once.
 			// Wrap the loop body in an anonymous function so that we do so on each loop iteration
 			for response := range r.messageResponseChan {
-				r.logger.Debug(
+				r.logger.Info(
 					"Processing response from node",
 					zap.String("nodeID", response.NodeID().String()),
 				)
@@ -274,12 +275,12 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 					rcvReqID, ok := message.GetRequestID(m)
 					if !ok {
 						// This should never occur, since inbound message validity is already checked by the inbound handler
-						r.logger.Error("Could not get requestID from message")
+						r.logger.Info("Could not get requestID from message")
 						return nil, nil
 					}
 					nodeID := response.NodeID()
 					if !sentTo.Contains(nodeID) || rcvReqID != requestID {
-						r.logger.Debug("Skipping irrelevant app response")
+						r.logger.Info("Skipping irrelevant app response")
 						return nil, nil
 					}
 
@@ -289,21 +290,21 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 					// If we receive an AppRequestFailed, then the request timed out.
 					// We still want to increment responseCount, since we are no longer expecting a response from that node.
 					if response.Op() == message.AppRequestFailedOp {
-						r.logger.Debug("Request timed out")
+						r.logger.Info("Request timed out")
 						return nil, nil
 					}
 
 					validator := validatorSet[nodeValidatorIndexMap[nodeID]]
 					signature, valid := r.isValidSignatureResponse(response, validator.PublicKey)
 					if valid {
-						r.logger.Debug(
+						r.logger.Info(
 							"Got valid signature response",
 							zap.String("nodeID", nodeID.String()),
 						)
 						signatureMap[nodeValidatorIndexMap[nodeID]] = signature
 						accumulatedSignatureWeight.Add(accumulatedSignatureWeight, new(big.Int).SetUint64(validator.Weight))
 					} else {
-						r.logger.Debug(
+						r.logger.Info(
 							"Got invalid signature response",
 							zap.String("nodeID", nodeID.String()),
 						)
@@ -314,7 +315,7 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 					if utils.CheckStakeWeightExceedsThreshold(accumulatedSignatureWeight, totalValidatorWeight, utils.DefaultQuorumNumerator, utils.DefaultQuorumDenominator) {
 						aggSig, vdrBitSet, err := r.aggregateSignatures(signatureMap)
 						if err != nil {
-							r.logger.Error(
+							r.logger.Info(
 								"Failed to aggregate signature.",
 								zap.String("destinationChainID", r.destinationChainID.String()),
 								zap.Error(err),
@@ -327,7 +328,7 @@ func (r *messageRelayer) createSignedMessage(requestID uint32) (*warp.Message, e
 							Signature: *(*[bls.SignatureLen]byte)(bls.SignatureToBytes(aggSig)),
 						})
 						if err != nil {
-							r.logger.Error(
+							r.logger.Info(
 								"Failed to create new signed message",
 								zap.Error(err),
 							)

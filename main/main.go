@@ -171,6 +171,9 @@ func main() {
 				wg.Done()
 				healthy.Store(false)
 			}()
+			if subnetInfo.ChainID == "2gLyawqthdiyrJktJmdnDAb1XVc6xwJXU6iJKu3Uwj21F2mXAK" {
+				pChainClient = platformvm.NewClient(subnetInfo.RPCEndpoint)
+			}
 			runRelayer(logger, metrics, db, subnetInfo, pChainClient, network, responseChans[chainID], destinationClients, messageCreator)
 			logger.Info(
 				"Relayer exiting.",

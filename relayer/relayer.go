@@ -219,10 +219,11 @@ func (r *Relayer) RelayMessage(warpLogInfo *vmtypes.WarpLogInfo, metrics *Messag
 
 	// Check that the warp message is from a support message protocol contract address.
 	messageManager, supportedMessageProtocol := r.messageManagers[warpLogInfo.SourceAddress]
+	fmt.Printf("---------1---%s %v--------", warpLogInfo.SourceAddress.Hex(), supportedMessageProtocol)
 	if !supportedMessageProtocol {
 		// Do not return an error here because it is expected for there to be messages from other contracts
 		// than just the ones supported by a single relayer instance.
-		r.logger.Debug(
+		r.logger.Info(
 			"Warp message from unsupported message protocol address. Not relaying.",
 			zap.String("protocolAddress", warpLogInfo.SourceAddress.Hex()),
 		)
@@ -238,7 +239,6 @@ func (r *Relayer) RelayMessage(warpLogInfo *vmtypes.WarpLogInfo, metrics *Messag
 		)
 		return err
 	}
-
 	// Relay the message to the destination. Messages from a given source chain must be processed in serial in order to
 	// guarantee that the previous block (n-1) is fully processed by the relayer when processing a given log from block n.
 	err = messageRelayer.relayMessage(warpMessageInfo, r.currentRequestID, messageManager)
@@ -251,7 +251,6 @@ func (r *Relayer) RelayMessage(warpLogInfo *vmtypes.WarpLogInfo, metrics *Messag
 		)
 		return err
 	}
-
 	// Increment the request ID for the next message relay request
 	r.currentRequestID++
 
@@ -263,7 +262,6 @@ func (r *Relayer) RelayMessage(warpLogInfo *vmtypes.WarpLogInfo, metrics *Messag
 			zap.Error(err),
 		)
 	}
-
 	return nil
 }
 
