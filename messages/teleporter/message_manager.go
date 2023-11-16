@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"log"
 
 	"github.com/ava-labs/avalanchego/cache"
 	"github.com/ava-labs/avalanchego/ids"
@@ -184,6 +186,7 @@ func (m *messageManager) messageDelivered(
 		To:   &protocolAddress,
 		Data: data,
 	}
+	log.Printf("call messageReceived info %s %s %s ", protocolAddress.Hex(), callMessage.To.Hex(), hexutil.Encode(callMessage.Data))
 	result, err := client.CallContract(context.Background(), callMessage, nil)
 	if err != nil {
 		m.logger.Error(
