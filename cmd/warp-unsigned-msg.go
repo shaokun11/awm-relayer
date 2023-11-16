@@ -19,7 +19,7 @@ var warpUnsignedMsgCmd = &cobra.Command{
 	Short: "warp the send payload to unsigned message",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 6 {
-			return errors.New("the four params should be: payload sourceChainID networkID sourceAddress destinationChainID destinationAddress")
+			return errors.New("the params should be: payload sourceChainID networkID sourceAddress destinationChainID destinationAddress")
 		}
 		payload, err := hexutil.Decode(args[0])
 		if err != nil {
@@ -60,12 +60,11 @@ var warpUnsignedMsgCmd = &cobra.Command{
 		}
 
 		var data = struct {
-			Topic   []common.Hash `json:"topic"`
-			Payload string        `json:"payload"`
+			Topics []common.Hash `json:"topics"`
+			Data   string        `json:"data"`
 		}{
-
-			Topic:   topic,
-			Payload: hexutil.Encode(unsignedWarpMessage.Bytes()),
+			Topics: topic,
+			Data:   hexutil.Encode(unsignedWarpMessage.Bytes()),
 		}
 		marshal, err := json.Marshal(data)
 		if err != nil {
