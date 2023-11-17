@@ -40,11 +40,11 @@ var warpSignedMsgCmd = &cobra.Command{
 		}
 		signature := bls.Sign(pk, message.Bytes())
 		var ret = struct {
-			Signature       string `json:"signature"`
-			UnsignedMessage string `json:"unsigned_message"`
+			Signature string `json:"signature"`
+			//UnsignedMessage string `json:"unsigned_message"`
 		}{
-			UnsignedMessage: hexutil.Encode(message.Bytes()),
-			Signature:       hexutil.Encode(bls.SignatureToBytes(signature)),
+			//UnsignedMessage: hexutil.Encode(message.Bytes()),
+			Signature: hexutil.Encode(bls.SignatureToBytes(signature)),
 		}
 		marshal, err := json.Marshal(ret)
 		if err != nil {
