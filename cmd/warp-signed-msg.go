@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
@@ -11,6 +10,12 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/spf13/cobra"
 )
+
+func newValidator() *bls.SecretKey {
+	// windows不可用
+	sk, _ := bls.NewSecretKey()
+	return sk
+}
 
 var warpSignedMsgCmd = &cobra.Command{
 	Use:   "warp-signed-msg",
@@ -31,22 +36,31 @@ var warpSignedMsgCmd = &cobra.Command{
 		// subnet中通过rpc 像avalanchego请求签名
 		// sig, err := b.warpSigner.Sign(unsignedMessage)
 		// 此处直接返回签名
-		keyBytes, _ := hex.DecodeString("0040c137287b7d169e076cb80d69bf98222ea780693b3bb4989c5998508490ff")
-		if err != nil {
-			return err
-		}
-		pk, err := bls.SecretKeyFromBytes(keyBytes)
-		if err != nil {
-			return err
-		}
-		signature := bls.Sign(pk, message.Bytes())
-		count := 5
+		//keyBytes, _ := hex.DecodeString("0040c137287b7d169e076cb80d69bf98222ea780693b3bb4989c5998508490ff")
+		//if err != nil {
+		//	return err
+		//}
+		//pk, err := bls.SecretKeyFromBytes(keyBytes)
+		//if err != nil {
+		//	return err
+		//}
+		//signature := bls.Sign(pk, message.Bytes())
+
+		vdr1sk := newValidator()
+		vdr2sk := newValidator()
+		vdr3sk := newValidator()
+		count := 3
 		signatures := make([]*bls.Signature, 0, count)
+		sig1 := bls.Sign(vdr1sk, message.Bytes())
+		sig2 := bls.Sign(vdr2sk, message.Bytes())
+		sig3 := bls.Sign(vdr3sk, message.Bytes())
+		signatures = append(signatures, sig1)
+		signatures = append(signatures, sig2)
+		signatures = append(signatures, sig3)
 		bitSet := set.NewBits()
-		for i := 0; i < count; i++ {
-			signatures = append(signatures, signature)
-			bitSet.Add(i)
-		}
+		bitSet.Add(0)
+		bitSet.Add(1)
+		bitSet.Add(2)
 		aggSig, err := bls.AggregateSignatures(signatures)
 		signedMsg, err := warp.NewMessage(message, &warp.BitSetSignature{
 			Signers:   bitSet.Bytes(),
