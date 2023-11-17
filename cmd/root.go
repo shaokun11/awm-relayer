@@ -23,4 +23,5 @@ func init() {
 	rootCmd.AddCommand(txCmd)
 	rootCmd.AddCommand(accessListCmd)
 	rootCmd.AddCommand(warpUnsignedMsgCmd)
+	rootCmd.AddCommand(warpSignedMsgCmd)
 }
