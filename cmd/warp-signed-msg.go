@@ -40,9 +40,10 @@ var warpSignedMsgCmd = &cobra.Command{
 			return err
 		}
 		signature := bls.Sign(pk, message.Bytes())
-		signatures := make([]*bls.Signature, 0, 3)
+		count := 5
+		signatures := make([]*bls.Signature, 0, count)
 		bitSet := set.NewBits()
-		for i := 0; i < 5; i++ {
+		for i := 0; i < count; i++ {
 			signatures = append(signatures, signature)
 			bitSet.Add(i)
 		}
