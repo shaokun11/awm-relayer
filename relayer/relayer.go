@@ -219,7 +219,7 @@ func (r *Relayer) RelayMessage(warpLogInfo *vmtypes.WarpLogInfo, metrics *Messag
 
 	// Check that the warp message is from a support message protocol contract address.
 	messageManager, supportedMessageProtocol := r.messageManagers[warpLogInfo.SourceAddress]
-	fmt.Printf("---------1---%s %v--------", warpLogInfo.SourceAddress.Hex(), supportedMessageProtocol)
+	fmt.Printf("%s %v \n", warpLogInfo.SourceAddress.Hex(), supportedMessageProtocol)
 	if !supportedMessageProtocol {
 		// Do not return an error here because it is expected for there to be messages from other contracts
 		// than just the ones supported by a single relayer instance.

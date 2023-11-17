@@ -97,6 +97,9 @@ func (r *messageRelayer) relayMessage(warpMessageInfo *vmtypes.WarpMessageInfo, 
 	startCreateSignedMessageTime := time.Now()
 	// Query nodes on the origin chain for signatures, and construct the signed warp message.
 	signedMessage, err := r.createSignedMessage(requestID)
+
+	//signedMessage = GetWarpSignature(warpMessageInfo.WarpUnsignedMessage.ID())
+
 	if err != nil {
 		r.logger.Error(
 			"Failed to create signed warp message",

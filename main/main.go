@@ -172,9 +172,11 @@ func main() {
 				healthy.Store(false)
 			}()
 			if subnetInfo.ChainID == "2gLyawqthdiyrJktJmdnDAb1XVc6xwJXU6iJKu3Uwj21F2mXAK" {
-				pChainClient = platformvm.NewClient(subnetInfo.RPCEndpoint)
+				pChainClientMe := platformvm.NewClient(subnetInfo.RPCEndpoint)
+				runRelayer(logger, metrics, db, subnetInfo, pChainClientMe, network, responseChans[chainID], destinationClients, messageCreator)
+			} else {
+				runRelayer(logger, metrics, db, subnetInfo, pChainClient, network, responseChans[chainID], destinationClients, messageCreator)
 			}
-			runRelayer(logger, metrics, db, subnetInfo, pChainClient, network, responseChans[chainID], destinationClients, messageCreator)
 			logger.Info(
 				"Relayer exiting.",
 				zap.String("chainID", chainID.String()),
