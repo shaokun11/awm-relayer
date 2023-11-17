@@ -7,3 +7,5 @@ __debug_bin
 main.log
 server.log
 *.test
+dist
+.idea

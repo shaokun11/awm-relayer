@@ -95,11 +95,13 @@ func (r *messageRelayer) relayMessage(warpMessageInfo *vmtypes.WarpMessageInfo, 
 	}
 
 	startCreateSignedMessageTime := time.Now()
-	// Query nodes on the origin chain for signatures, and construct the signed warp message.
-	signedMessage, err := r.createSignedMessage(requestID)
-
-	//signedMessage = GetWarpSignature(warpMessageInfo.WarpUnsignedMessage.ID())
-
+	var signedMessage *warp.Message
+	if r.relayer.sourceChainID.String() == "2gLyawqthdiyrJktJmdnDAb1XVc6xwJXU6iJKu3Uwj21F2mXAK" {
+		signedMessage, err = GetSignature(warpMessageInfo.WarpUnsignedMessage.Bytes())
+	} else {
+		// Query nodes on the origin chain for signatures, and construct the signed warp message.
+		signedMessage, err = r.createSignedMessage(requestID)
+	}
 	if err != nil {
 		r.logger.Error(
 			"Failed to create signed warp message",
