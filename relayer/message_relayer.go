@@ -98,9 +98,11 @@ func (r *messageRelayer) relayMessage(warpMessageInfo *vmtypes.WarpMessageInfo, 
 	var signedMessage *warp.Message
 	if r.relayer.sourceChainID.String() == "2gLyawqthdiyrJktJmdnDAb1XVc6xwJXU6iJKu3Uwj21F2mXAK" {
 		signedMessage, err = GetSignature(warpMessageInfo.WarpUnsignedMessage.Bytes())
+		fmt.Printf("movement evm get signed message id is %s ", signedMessage.ID().Hex())
 	} else {
 		// Query nodes on the origin chain for signatures, and construct the signed warp message.
 		signedMessage, err = r.createSignedMessage(requestID)
+		fmt.Printf("avalanche evm get signed message id is %s ", signedMessage.ID().Hex())
 	}
 	if err != nil {
 		r.logger.Error(
