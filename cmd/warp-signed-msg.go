@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
+	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	"github.com/ava-labs/awm-relayer/utils"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -39,12 +40,21 @@ var warpSignedMsgCmd = &cobra.Command{
 			return err
 		}
 		signature := bls.Sign(pk, message.Bytes())
+		signatures := make([]*bls.Signature, 0, 3)
+		bitSet := set.NewBits()
+		for i := 0; i < 5; i++ {
+			signatures = append(signatures, signature)
+			bitSet.Add(i)
+		}
+		aggSig, err := bls.AggregateSignatures(signatures)
+		signedMsg, err := warp.NewMessage(message, &warp.BitSetSignature{
+			Signers:   bitSet.Bytes(),
+			Signature: *(*[bls.SignatureLen]byte)(bls.SignatureToBytes(aggSig)),
+		})
 		var ret = struct {
 			Signature string `json:"signature"`
-			//UnsignedMessage string `json:"unsigned_message"`
 		}{
-			//UnsignedMessage: hexutil.Encode(message.Bytes()),
-			Signature: hexutil.Encode(bls.SignatureToBytes(signature)),
+			Signature: hexutil.Encode(bls.SignatureToBytes(signedMsg)),
 		}
 		marshal, err := json.Marshal(ret)
 		if err != nil {
