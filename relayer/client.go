@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
-	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"net/http"
@@ -33,6 +32,7 @@ type RPCError struct {
 
 type SignatureResponse struct {
 	Signature string `json:"signature"`
+	Bitset    string `json:"bit_set"`
 }
 
 func GetSignature(msg []byte) (*warp.Message, error) {
@@ -90,12 +90,12 @@ func GetSignature(msg []byte) (*warp.Message, error) {
 		if err != nil {
 			return nil, err
 		}
-		bitSet := set.NewBits()
-		bitSet.Add(0)
-		bitSet.Add(1)
-		bitSet.Add(2)
+		bitset, err := hexutil.Decode(result.Bitset)
+		if err != nil {
+			return nil, err
+		}
 		signedMsg, err := warp.NewMessage(unsignedMsg, &warp.BitSetSignature{
-			Signers:   bitSet.Bytes(),
+			Signers:   bitset,
 			Signature: *(*[bls.SignatureLen]byte)(bls.SignatureToBytes(signature)),
 		})
 		if err != nil {
