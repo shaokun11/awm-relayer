@@ -70,7 +70,7 @@ var warpSignedMsgCmd = &cobra.Command{
 			Signature string `json:"signature"`
 			BitSet    string `json:"bit_set"`
 		}{
-			Signature: hexutil.Encode(aggSig.Bytes()),
+			Signature: hexutil.Encode(bls.SignatureToBytes(aggSig)),
 			BitSet:    hexutil.Encode(bitSet.Bytes()),
 		}
 		marshal, err := json.Marshal(ret)
