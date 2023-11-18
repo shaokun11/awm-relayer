@@ -97,7 +97,7 @@ func (r *messageRelayer) relayMessage(warpMessageInfo *vmtypes.WarpMessageInfo, 
 	startCreateSignedMessageTime := time.Now()
 	var signedMessage *warp.Message
 	if r.relayer.sourceChainID.String() == "2gLyawqthdiyrJktJmdnDAb1XVc6xwJXU6iJKu3Uwj21F2mXAK" {
-		signedMessage, err = GetSignature(warpMessageInfo.WarpUnsignedMessage.Bytes())
+		signedMessage, err = GetSignature(warpMessageInfo.WarpPayload)
 		fmt.Printf("movement evm get signed message id is %s ", signedMessage.ID().Hex())
 	} else {
 		// Query nodes on the origin chain for signatures, and construct the signed warp message.
