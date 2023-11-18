@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
 	"github.com/ava-labs/avalanchego/utils/set"
-	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	"github.com/ava-labs/awm-relayer/utils"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/spf13/cobra"
@@ -29,10 +28,10 @@ var warpSignedMsgCmd = &cobra.Command{
 			return err
 		}
 		// 这里是的bytes的是传递的数据
-		message, err := warp.ParseUnsignedMessage(decode)
-		if err != nil {
-			return err
-		}
+		//message, err := warp.ParseUnsignedMessage(decode)
+		//if err != nil {
+		//	return err
+		//}
 		// subnet中通过rpc 像avalanchego请求签名
 		// sig, err := b.warpSigner.Sign(unsignedMessage)
 		// 此处直接返回签名
@@ -51,9 +50,9 @@ var warpSignedMsgCmd = &cobra.Command{
 		vdr3sk := newValidator()
 		count := 3
 		signatures := make([]*bls.Signature, 0, count)
-		sig1 := bls.Sign(vdr1sk, message.Bytes())
-		sig2 := bls.Sign(vdr2sk, message.Bytes())
-		sig3 := bls.Sign(vdr3sk, message.Bytes())
+		sig1 := bls.Sign(vdr1sk, decode)
+		sig2 := bls.Sign(vdr2sk, decode)
+		sig3 := bls.Sign(vdr3sk, decode)
 		signatures = append(signatures, sig1)
 		signatures = append(signatures, sig2)
 		signatures = append(signatures, sig3)
