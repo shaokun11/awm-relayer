@@ -64,7 +64,7 @@ var warpSignedMsgCmd = &cobra.Command{
 		aggSig, err := bls.AggregateSignatures(signatures)
 		signedMsg, err := warp.NewMessage(message, &warp.BitSetSignature{
 			Signers:   bitSet.Bytes(),
-			Signature: *(*[bls.SignatureLen]byte)(bls.SignatureToBytes(aggSig)),
+			Signature: [96]byte(bls.SignatureToBytes(aggSig)),
 		})
 		var ret = struct {
 			Signature string `json:"signature"`
