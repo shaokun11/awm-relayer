@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
+	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"net/http"
@@ -77,12 +78,30 @@ func GetSignature(msg []byte) (*warp.Message, error) {
 		if err != nil {
 			return nil, err
 		}
+		unsignedMsg, err := warp.ParseUnsignedMessage(msg)
+		if err != nil {
+			return nil, err
+		}
 		decode, err := hexutil.Decode(result.Signature)
 		if err != nil {
 			return nil, err
 		}
 		signature, err := bls.SignatureFromBytes(decode)
-		return signature, nil
+		if err != nil {
+			return nil, err
+		}
+		bitSet := set.NewBits()
+		bitSet.Add(0)
+		bitSet.Add(1)
+		bitSet.Add(2)
+		signedMsg, err := warp.NewMessage(unsignedMsg, &warp.BitSetSignature{
+			Signers:   bitSet.Bytes(),
+			Signature: *(*[bls.SignatureLen]byte)(bls.SignatureToBytes(signature)),
+		})
+		if err != nil {
+			return nil, err
+		}
+		return signedMsg, nil
 		//println("------newMessage------", signedMsg.ID().Hex())
 	}
 }
