@@ -48,18 +48,22 @@ var warpSignedMsgCmd = &cobra.Command{
 		vdr1sk := newValidator()
 		vdr2sk := newValidator()
 		vdr3sk := newValidator()
-		count := 3
+		vdr4sk := newValidator()
+		count := 4
 		signatures := make([]*bls.Signature, 0, count)
 		sig1 := bls.Sign(vdr1sk, decode)
 		sig2 := bls.Sign(vdr2sk, decode)
 		sig3 := bls.Sign(vdr3sk, decode)
+		sig4 := bls.Sign(vdr4sk, decode)
 		signatures = append(signatures, sig1)
 		signatures = append(signatures, sig2)
 		signatures = append(signatures, sig3)
+		signatures = append(signatures, sig4)
 		bitSet := set.NewBits()
 		bitSet.Add(0)
 		bitSet.Add(1)
 		bitSet.Add(2)
+		bitSet.Add(3)
 		aggSig, err := bls.AggregateSignatures(signatures)
 		//signedMsg, err := warp.NewMessage(message, &warp.BitSetSignature{
 		//	Signers:   bitSet.Bytes(),
