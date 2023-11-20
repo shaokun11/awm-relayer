@@ -8,11 +8,22 @@ import (
 	"github.com/ava-labs/awm-relayer/utils"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/spf13/cobra"
+	"io"
+	"os"
 )
 
-func newValidator() *bls.SecretKey {
-	// windows不可用
-	sk, _ := bls.NewSecretKey()
+func NewValidator(p string) *bls.SecretKey {
+	file, err := os.Open(p)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	// 读取文件内容
+	content, err := io.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+	sk, _ := bls.SecretKeyFromBytes(content)
 	return sk
 }
 
@@ -45,10 +56,10 @@ var warpSignedMsgCmd = &cobra.Command{
 		//}
 		//signature := bls.Sign(pk, message.Bytes())
 
-		vdr1sk := newValidator()
-		vdr2sk := newValidator()
-		vdr3sk := newValidator()
-		vdr4sk := newValidator()
+		vdr1sk := NewValidator("keys/n1.key")
+		vdr2sk := NewValidator("keys/n2.key")
+		vdr3sk := NewValidator("keys/n3.key")
+		vdr4sk := NewValidator("keys/n4.key")
 		count := 4
 		signatures := make([]*bls.Signature, 0, count)
 		sig1 := bls.Sign(vdr1sk, decode)

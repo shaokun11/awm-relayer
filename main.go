@@ -3,9 +3,7 @@
 
 package main
 
-import (
-	"github.com/ava-labs/awm-relayer/cmd"
-)
+import "github.com/ava-labs/awm-relayer/cmd"
 
 func main() {
 	cmd.Execute()
